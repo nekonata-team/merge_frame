@@ -9,32 +9,33 @@ test_dataディレクトリにサンプルのスクリーンショット画像�
 コマンドライン引数で各パスを指定します。
 
 ```bash
-go run main.go -screenshots=test_data/screenshots/ -frame=test_data/internal/frame.png -output=test_data/output
+go run main.go --screenshots=test_data/screenshots/ --frame=test_data/internal/frame.png --output=test_data/output
 ```
 
-- `-screenshots` : スクリーンショット画像が入ったフォルダ
-- `-frame` : 合成するフレーム画像のパス
-- `-output` : 出力先ディレクトリ
+- `--screenshots` : スクリーンショット画像が入ったフォルダ
+- `--frame` : 合成するフレーム画像のパス
+- `--output` : 出力先ディレクトリ
 
 ## ビルド手順
 
 1. 依存パッケージをインストール
 
-```bash
-go get github.com/fogleman/gg
-```
+    ```bash
+    go get github.com/fogleman/gg
+    go get github.com/urfave/cli/v2
+    ```
 
 2. ビルド
 
-```bash
-go build -o merge_frame main.go
-```
+    ```bash
+    go build -o merge_frame main.go
+    ```
 
 3. 実行例
 
-```bash
-./merge_frame -screenshots=test_data/screenshots/ -frame=test_data/internal/frame.png -output=test_data/output
-```
+    ```bash
+    ./merge_frame --screenshots=test_data/screenshots/ --frame=test_data/internal/frame.png --output=test_data/output
+    ```
 
 ## 備考
 

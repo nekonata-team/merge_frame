@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"image"
 	"image/draw"
 	"image/png"
@@ -10,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/fogleman/gg"
+	"github.com/urfave/cli/v2"
 )
 
 // calculateOffset calculates the offset needed to center image b within image a.
@@ -89,24 +89,51 @@ func processScreenshotsInFolder(folderPath string, frameImg image.Image, outputD
 }
 
 func main() {
-	folderPath := flag.String("screenshots", "integration_test/screenshots", "スクリーンショット画像のフォルダパス")
-	framePath := flag.String("frame", "assets/internal/frame.png", "フレーム画像のパス")
-	outputDir := flag.String("output", "assets/internal/release_screenshots", "出力ディレクトリ")
+	app := &cli.App{
+		Name:  "merge_frame",
+		Usage: "スクリーンショット画像をフレーム画像に合成して出力します",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "screenshots",
+				Usage:    "スクリーンショット画像のフォルダパス",
+				Required: true,
+			},
+			&cli.StringFlag{
+				Name:     "frame",
+				Usage:    "フレーム画像のパス",
+				Required: true,
+			},
+			&cli.StringFlag{
+				Name:     "output",
+				Usage:    "出力ディレクトリ",
+				Required: true,
+			},
+		},
+		Action: func(c *cli.Context) error {
+			folderPath := c.String("screenshots")
+			framePath := c.String("frame")
+			outputDir := c.String("output")
 
-	flag.Parse()
+			frameImg, err := loadImage(framePath)
+			if err != nil {
+				log.Fatalf("フレーム画像の読み込みに失敗しました: %v", err)
+			}
 
-	frameImg, err := loadImage(*framePath)
-	if err != nil {
-		log.Fatalf("フレーム画像の読み込みに失敗しました: %v", err)
+			err = os.MkdirAll(outputDir, os.ModePerm)
+			if err != nil {
+				log.Fatalf("出力ディレクトリの作成に失敗しました: %v", err)
+			}
+
+			err = processScreenshotsInFolder(folderPath, frameImg, outputDir)
+			if err != nil {
+				log.Fatalf("画像の処理に失敗しました: %v", err)
+			}
+			return nil
+		},
 	}
 
-	err = os.MkdirAll(*outputDir, os.ModePerm)
+	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatalf("出力ディレクトリの作成に失敗しました: %v", err)
-	}
-
-	err = processScreenshotsInFolder(*folderPath, frameImg, *outputDir)
-	if err != nil {
-		log.Fatalf("画像の処理に失敗しました: %v", err)
+		log.Fatal(err)
 	}
 }
