@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"image"
 	"image/draw"
 	"image/png"
@@ -88,21 +89,23 @@ func processScreenshotsInFolder(folderPath string, frameImg image.Image, outputD
 }
 
 func main() {
-	folderPath := "integration_test/screenshots"
-	framePath := "assets/internal/frame.png"
-	outputDir := "assets/internal/release_screenshots"
+	folderPath := flag.String("screenshots", "integration_test/screenshots", "スクリーンショット画像のフォルダパス")
+	framePath := flag.String("frame", "assets/internal/frame.png", "フレーム画像のパス")
+	outputDir := flag.String("output", "assets/internal/release_screenshots", "出力ディレクトリ")
 
-	frameImg, err := loadImage(framePath)
+	flag.Parse()
+
+	frameImg, err := loadImage(*framePath)
 	if err != nil {
 		log.Fatalf("フレーム画像の読み込みに失敗しました: %v", err)
 	}
 
-	err = os.MkdirAll(outputDir, os.ModePerm)
+	err = os.MkdirAll(*outputDir, os.ModePerm)
 	if err != nil {
 		log.Fatalf("出力ディレクトリの作成に失敗しました: %v", err)
 	}
 
-	err = processScreenshotsInFolder(folderPath, frameImg, outputDir)
+	err = processScreenshotsInFolder(*folderPath, frameImg, *outputDir)
 	if err != nil {
 		log.Fatalf("画像の処理に失敗しました: %v", err)
 	}
