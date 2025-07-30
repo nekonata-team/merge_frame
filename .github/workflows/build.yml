@@ -10,7 +10,6 @@ on:
 permissions:
   contents: write
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,12 +29,12 @@ jobs:
         run: |
           ext=""
           if [ "${{ matrix.os }}" = "windows" ]; then ext=".exe"; fi
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o merge_frame${ext} main.go
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o merge_frame-${{ matrix.os }}-${{ matrix.arch }}${ext} main.go
       - name: Archive artifact
         uses: actions/upload-artifact@v4
         with:
           name: merge_frame-${{ matrix.os }}-${{ matrix.arch }}
-          path: merge_frame*
+          path: merge_frame-${{ matrix.os }}-${{ matrix.arch }}*
 
   release:
     needs: build
